@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>حاسبة رسوم جوميا للبائعين</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#f4f5f9;color:#222;min-height:100vh;padding:14px;}
+    .wrap{max-width:680px;margin:0 auto;}
+
+    .header{background:linear-gradient(135deg,#f68b1e,#d96500);color:#fff;border-radius:16px;padding:18px 20px 14px;margin-bottom:12px;}
+    .hrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+    .header h1{font-size:1.25rem;font-weight:800;line-height:1.3;}
+    .header p{font-size:.78rem;opacity:.9;margin-top:4px;}
+    .hbadges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+    .hb{background:rgba(255,255,255,.22);border-radius:20px;padding:3px 10px;font-size:.69rem;}
+    .lang-btn{background:#fff;color:#d96500;border:none;border-radius:8px;padding:6px 13px;font-weight:700;cursor:pointer;font-size:.8rem;flex-shrink:0;}
+
+    .card{background:#fff;border-radius:12px;box-shadow:0 1px 5px rgba(0,0,0,.07);padding:14px 16px;margin-bottom:10px;}
+    .ctitle{font-size:.88rem;font-weight:700;color:#333;margin-bottom:10px;}
+
+    .tog{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+    .tbtn{border:1.5px solid #e0e0e0;background:#fff;border-radius:9px;padding:9px;font-size:.82rem;font-family:inherit;cursor:pointer;text-align:center;font-weight:600;color:#444;transition:all .15s;}
+    .tbtn:hover{border-color:#f68b1e;background:#fff8f0;}
+    .tbtn.active{background:#f68b1e;color:#fff;border-color:#f68b1e;}
+
+    .prow{display:flex;align-items:center;gap:9px;}
+    .prow input{flex:1;border:1.5px solid #ddd;border-radius:9px;padding:10px 13px;font-size:1.1rem;font-weight:700;font-family:inherit;outline:none;transition:border .2s;}
+    .prow input:focus{border-color:#f68b1e;}
+    .prow .cur{color:#888;font-weight:600;}
+
+    .mcat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;}
+    .mcat{border:1.5px solid #e8e8e8;background:#fafafa;border-radius:9px;padding:8px 10px;cursor:pointer;font-size:.8rem;font-weight:600;color:#444;text-align:center;transition:all .14s;line-height:1.4;}
+    .mcat:hover{border-color:#f68b1e;background:#fff8f0;}
+    .mcat.active{background:#f68b1e;color:#fff;border-color:#f68b1e;}
+
+    .sub-list{display:flex;flex-direction:column;gap:6px;}
+    .sub-item{border:1.5px solid #ebebeb;background:#fafafa;border-radius:9px;padding:10px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:all .13s;}
+    .sub-item:hover{border-color:#f68b1e;background:#fff8f0;}
+    .sub-item.active{border-color:#f68b1e;background:#fff3e0;}
+    .sub-name{font-size:.83rem;font-weight:600;color:#333;flex:1;line-height:1.35;}
+    .chips{display:flex;gap:5px;flex-shrink:0;}
+    .chip{font-size:.68rem;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap;}
+    .chip-c{background:#e8f4fd;color:#005bab;}
+    .chip-s{background:#e6f9ed;color:#0a6b35;}
+
+    .info{background:#fff8f0;border:1px solid #fdd9b0;border-radius:10px;padding:10px 13px;font-size:.76rem;color:#7a4000;margin-bottom:10px;line-height:1.6;}
+    .info strong{display:block;margin-bottom:2px;color:#d96500;}
+    .info .exm{color:#1a6e1a;font-weight:600;margin-top:2px;}
+
+    .res-card{background:#fff;border:2.5px solid #f68b1e;border-radius:14px;padding:16px;margin-bottom:10px;}
+    .res-hd{font-size:.9rem;font-weight:800;color:#d96500;margin-bottom:12px;}
+    .rrow{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f2f2f2;gap:6px;}
+    .rrow:last-child{border:none;}
+    .rlbl{color:#666;font-size:.82rem;flex:1;}
+    .rval{font-weight:700;font-size:.87rem;white-space:nowrap;}
+    .rval.red{color:#c62828;}
+    .netrow{background:#f5f6fa;border-radius:10px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+    .netlbl{font-weight:700;font-size:.9rem;}
+    .mtag{display:inline-block;background:#fff3cd;color:#856404;border-radius:20px;padding:2px 8px;font-size:.66rem;font-weight:700;margin-top:3px;}
+    .etag{display:inline-block;background:#d4edda;color:#155724;border-radius:20px;padding:2px 8px;font-size:.66rem;font-weight:700;margin-top:3px;}
+    .vatnote{font-size:.7rem;color:#bbb;text-align:center;margin-top:8px;}
+    .hidden{display:none!important;}
+    footer{text-align:center;font-size:.7rem;color:#bbb;padding:6px 0 18px;}
+
+    @media(max-width:440px){.mcat-grid{grid-template-columns:repeat(2,1fr);}.header h1{font-size:1rem;}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="hrow">
+      <div>
+        <h1 id="ttl">حاسبة رسوم جوميا للبائعين</h1>
+        <p id="sub">اختر الفئة الرئيسية ثم الفئة الفرعية — تُحسب جميع الرسوم تلقائياً</p>
+      </div>
+      <button class="lang-btn" onclick="toggleLang()">English</button>
+    </div>
+    <div class="hbadges">
+      <span class="hb" id="b1">المبالغ بالجنيه المصري</span>
+      <span class="hb" id="b2">الرسوم تشمل ضريبة القيمة المضافة 14%</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle" id="ltype">نوع المنتج</div>
+    <div class="tog">
+      <button class="tbtn active" id="btn-drop" onclick="setType('drop')">🏪 <span id="lbl-drop">بائع عادي</span></button>
+      <button class="tbtn" id="btn-jex" onclick="setType('jex')">⚡ <span id="lbl-jex">جوميا إكسبريس</span></button>
+    </div>
+    <p id="jex-hint" class="hidden" style="font-size:.73rem;color:#888;text-align:center;margin-top:6px;"></p>
+  </div>
+
+  <div class="card">
+    <div class="ctitle" id="lprice">سعر بيع المنتج</div>
+    <div class="prow">
+      <input type="number" id="price" min="0" placeholder="أدخل السعر..." oninput="calc()"/>
+      <span class="cur" id="lcur">جنيه</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle" id="lmain">الفئة الرئيسية</div>
+    <div class="mcat-grid" id="main-grid"></div>
+  </div>
+
+  <div class="card hidden" id="sub-card">
+    <div class="ctitle" id="lsub">الفئة الفرعية</div>
+    <div class="sub-list" id="sub-list"></div>
+  </div>
+
+  <div class="info">
+    <strong id="i-title">ℹ️ قاعدة الحد الأدنى للعمولة</strong>
+    <span id="i-body">إذا كانت العمولة المحسوبة أقل من 10 جنيه (11.40 جنيه شامل ضريبة القيمة المضافة)، يُطبَّق الحد الأدنى تلقائياً.</span>
+    <div class="exm" id="i-exm">✅ معفيون: البقالة • الحفاضات • جوميا إكسبريس</div>
+  </div>
+
+  <div class="res-card hidden" id="result">
+    <div class="res-hd" id="lres">نتيجة الحساب</div>
+    <div class="rrow">
+      <div class="rlbl" id="lsell">سعر البيع</div>
+      <div class="rval" id="r-price"></div>
+    </div>
+    <div class="rrow">
+      <div>
+        <div class="rlbl" id="lcomm">عمولة جوميا</div>
+        <div id="r-min-w" class="hidden"><span class="mtag" id="r-min-t"></span></div>
+        <div id="r-exm-w" class="hidden"><span class="etag" id="r-exm-t"></span></div>
+      </div>
+      <div class="rval red" id="r-comm"></div>
+    </div>
+    <div class="rrow">
+      <div class="rlbl" id="lship">رسوم المعالجة والشحن</div>
+      <div class="rval red" id="r-ship"></div>
+    </div>
+    <div class="rrow">
+      <div class="rlbl"><strong id="ltot">إجمالي الرسوم</strong></div>
+      <div class="rval red" id="r-tot"></div>
+    </div>
+    <div class="netrow">
+      <div class="netlbl" id="lnet">صافي المبلغ المستلم</div>
+      <div id="r-net" style="font-weight:800;font-size:1.18rem;"></div>
+    </div>
+    <p class="vatnote" id="lvatn">* جميع الرسوم تشمل ضريبة القيمة المضافة 14%</p>
+  </div>
+
+  <footer id="lfooter">هذه الحاسبة للأغراض التوعوية فقط. قد تختلف الأرقام الفعلية بناءً على الشروط المعمول بها.</footer>
+</div>
+
+<script>
+/*
+  DATA — sourced from "Com and proc fees.xlsx"
+  comm  = commission percentage (%)
+  drop  = Drop-shipping processing + shipping fee (EGP, incl. 14% VAT)
+  jex   = Jumia Express processing + shipping fee (EGP, incl. 14% VAT)
+  exemptMin = exempt from 10 EGP minimum commission rule
+*/
+const DATA = [
+  {
+    ar:"الموبايلات والتابلت", en:"Mobiles & Tablets",
+    subs:[
+      {ar:"الموبايلات (أندرويد / iOS)",    en:"Mobile Phones (Android / iOS)",     comm:3.9,  drop:15,  jex:12},
+      {ar:"التابلت",                         en:"Tablets",                           comm:3.9,  drop:15,  jex:12},
+      {ar:"الساعات الذكية",                  en:"Smart Watches",                     comm:7,    drop:15,  jex:12},
+      {ar:"اكسسوارات الموبايل والتابلت",     en:"Mobile & Tablet Accessories",       comm:14.5, drop:15,  jex:12},
+      {ar:"تقنية قابلة للارتداء",            en:"Wearable Technology",               comm:7,    drop:25,  jex:12},
+    ]
+  },
+  {
+    ar:"أجهزة كمبيوتر", en:"Computers",
+    subs:[
+      {ar:"لاب توب",                         en:"Laptops",                           comm:4.5,  drop:25,  jex:20},
+      {ar:"أجهزة كمبيوتر وشاشات",           en:"Desktops & Monitors",               comm:6,    drop:25,  jex:20},
+      {ar:"اكسسوارات الكمبيوتر",             en:"Computer Accessories",              comm:14,   drop:25,  jex:20},
+      {ar:"هارد درايف والتخزين",             en:"Storage & Hard Drives",             comm:10,   drop:25,  jex:20},
+      {ar:"طابعات وماسحات ضوئية",           en:"Printers & Scanners",               comm:6,    drop:25,  jex:20},
+      {ar:"قطع غيار وكمبوننتس",             en:"Components & Spare Parts",          comm:11.4, drop:25,  jex:20},
+      {ar:"منتجات الشبكات والراوتر",         en:"Network Products & Routers",        comm:14,   drop:25,  jex:20},
+    ]
+  },
+  {
+    ar:"المنزل والأجهزة", en:"Home & Appliances",
+    subs:[
+      {ar:"أجهزة منزلية صغيرة",             en:"Small Home Appliances",             comm:7,    drop:25,  jex:20},
+      {ar:"أجهزة منزلية كبيرة",             en:"Large Home Appliances",             comm:4.2,  drop:120, jex:110},
+      {ar:"أدوات المطبخ والطهي",             en:"Kitchen Tools & Cookware",          comm:13,   drop:25,  jex:20},
+      {ar:"مستلزمات المنزل والمفروشات",      en:"Home & Bedding Essentials",         comm:13,   drop:15,  jex:12},
+      {ar:"تنظيم وتخزين منزلي",             en:"Home Storage & Organization",       comm:13,   drop:15,  jex:12},
+      {ar:"أثاث وديكور",                    en:"Furniture & Decor",                 comm:13,   drop:60,  jex:50},
+      {ar:"حدائق وخارجي",                   en:"Garden & Outdoors",                 comm:13,   drop:15,  jex:12},
+    ]
+  },
+  {
+    ar:"تلفزيونات وصوتيات", en:"TVs & Audio",
+    subs:[
+      {ar:"تلفزيونات",                       en:"Televisions",                       comm:3.8,  drop:25,  jex:25},
+      {ar:"سماعات وإيربود",                 en:"Headphones & Earbuds",              comm:9,    drop:25,  jex:20},
+      {ar:"صوتيات منزلية وراديو",            en:"Home Audio & Radio",               comm:5,    drop:25,  jex:20},
+      {ar:"مسرح منزلي وهاي فاي وستيريو",    en:"Home Theatre, Hi-Fi & Stereo",      comm:5,    drop:25,  jex:20},
+      {ar:"أجهزة استقبال (رسيفر)",           en:"TV Receivers & Satellite",          comm:6,    drop:25,  jex:12},
+    ]
+  },
+  {
+    ar:"ألعاب وترفيه", en:"Gaming & Entertainment",
+    subs:[
+      {ar:"أجهزة ألعاب (كونسول)",            en:"Gaming Consoles (PS / Xbox)",       comm:3.5,  drop:25,  jex:20},
+      {ar:"ألعاب الأطفال والهدايا",           en:"Toys & Kids Games",                 comm:10,   drop:25,  jex:20},
+      {ar:"ألعاب طاولة وورق",               en:"Board & Card Games",                comm:13,   drop:15,  jex:12},
+    ]
+  },
+  {
+    ar:"كاميرات", en:"Cameras & Photo",
+    subs:[
+      {ar:"كاميرات ومراقبة",                 en:"Cameras & Surveillance",            comm:6,    drop:15,  jex:12},
+    ]
+  },
+  {
+    ar:"الأزياء والإكسسوارات", en:"Fashion & Accessories",
+    subs:[
+      {ar:"أزياء (ملابس وأحذية وحقائب)",    en:"Fashion (Clothing, Shoes & Bags)",  comm:15,   drop:15,  jex:12},
+      {ar:"مجوهرات وذهب",                   en:"Jewelry & Gold",                    comm:15,   drop:15,  jex:12},
+      {ar:"ساعات",                           en:"Watches",                           comm:12,   drop:15,  jex:12},
+      {ar:"نظارات شمس",                     en:"Sunglasses & Eyewear",              comm:13,   drop:15,  jex:12},
+      {ar:"اكسسوارات إلكترونية",             en:"Electronics Accessories",           comm:15,   drop:15,  jex:12},
+    ]
+  },
+  {
+    ar:"الصحة والجمال", en:"Health & Beauty",
+    subs:[
+      {ar:"صحة وجمال ورعاية شخصية",         en:"Health & Personal Care",            comm:13,   drop:15,  jex:12},
+      {ar:"أجهزة التجميل والشعر",            en:"Beauty & Hair Appliances",          comm:11,   drop:15,  jex:12},
+      {ar:"مكياج",                           en:"Makeup",                            comm:13,   drop:15,  jex:12},
+      {ar:"عطور",                            en:"Fragrances & Perfumes",             comm:11.4, drop:15,  jex:12},
+    ]
+  },
+  {
+    ar:"مستلزمات الأطفال", en:"Baby & Kids",
+    subs:[
+      {ar:"عربات ومستلزمات وملابس أطفال",   en:"Baby Gear, Strollers & Clothing",   comm:9,    drop:15,  jex:12},
+      {ar:"حفاضات",                          en:"Diapers",                           comm:9,    drop:25,  jex:20, exemptMin:true},
+    ]
+  },
+  {
+    ar:"الرياضة", en:"Sports",
+    subs:[
+      {ar:"أدوات رياضية صغيرة (أثقال، أربطة)",en:"Small Sports Equipment (Weights, Bands)", comm:12.5, drop:25, jex:20},
+      {ar:"أدوات رياضية كبيرة (مشي، دراجة)", en:"Large Sports Equipment (Treadmill, Bike)", comm:12.5, drop:60, jex:50},
+    ]
+  },
+  {
+    ar:"البقالة", en:"Grocery",
+    subs:[
+      {ar:"بقالة ومواد غذائية",              en:"Grocery & Food Products",           comm:7,    drop:15,  jex:12, exemptMin:true},
+      {ar:"طعام ومستلزمات الحيوانات الأليفة",en:"Pet Food & Supplies",               comm:11,   drop:25,  jex:20},
+    ]
+  },
+  {
+    ar:"السيارات والمركبات", en:"Automotive",
+    subs:[
+      {ar:"إطارات وكاوتش",                  en:"Tires & Wheels",                    comm:12,   drop:15,  jex:12},
+      {ar:"زيوت وسوائل",                    en:"Oils & Fluids",                     comm:11.4, drop:25,  jex:20},
+      {ar:"اكسسوارات وقطع غيار السيارات",   en:"Car Accessories & Parts",           comm:12,   drop:25,  jex:20},
+    ]
+  },
+  {
+    ar:"أخرى", en:"Other",
+    subs:[
+      {ar:"قرطاسية وأدوات مكتبية",          en:"Stationery & Office Supplies",      comm:11,   drop:15,  jex:12},
+      {ar:"كتب وميديا",                     en:"Books & Media",                     comm:8,    drop:15,  jex:12},
+      {ar:"أدوات موسيقية",                  en:"Musical Instruments",               comm:11.4, drop:15,  jex:12},
+    ]
+  },
+];
+
+const MIN_COMM = 11.4;
+let lang = 'ar';
+let isJex = false;
+let selMain = null;
+let selSub = null;
+
+const T = {
+  ar:{
+    ttl:"حاسبة رسوم جوميا للبائعين",
+    sub:"اختر الفئة الرئيسية ثم الفئة الفرعية — تُحسب جميع الرسوم تلقائياً",
+    b1:"المبالغ بالجنيه المصري", b2:"الرسوم تشمل ضريبة القيمة المضافة 14%",
+    ltype:"نوع المنتج", ldrop:"بائع عادي", ljex:"جوميا إكسبريس",
+    jexhint:"جوميا إكسبريس: رسوم شحن أقل + معفى من الحد الأدنى للعمولة",
+    lprice:"سعر بيع المنتج", lcur:"جنيه",
+    lmain:"الفئة الرئيسية", lsub:"الفئة الفرعية",
+    ititle:"ℹ️ قاعدة الحد الأدنى للعمولة",
+    ibody:"إذا كانت العمولة المحسوبة أقل من 10 جنيه (11.40 جنيه شامل ضريبة القيمة المضافة)، يُطبَّق الحد الأدنى تلقائياً.",
+    iexm:"✅ معفيون من الحد الأدنى: البقالة • الحفاضات • جوميا إكسبريس",
+    lres:"نتيجة الحساب", lsell:"سعر البيع", lcomm:"عمولة جوميا",
+    lship:"رسوم المعالجة والشحن", ltot:"إجمالي الرسوم",
+    lnet:"صافي المبلغ المستلم",
+    lvatn:"* جميع الرسوم تشمل ضريبة القيمة المضافة 14%",
+    lfooter:"هذه الحاسبة للأغراض التوعوية فقط. قد تختلف الأرقام الفعلية بناءً على الشروط المعمول بها.",
+    minapply:"الحد الأدنى مُطبَّق", minnot:"معفى من الحد الأدنى", egp:"جنيه",
+  },
+  en:{
+    ttl:"Jumia Seller Fee Calculator",
+    sub:"Choose main category then subcategory — all fees calculated automatically",
+    b1:"All amounts in EGP", b2:"All fees include 14% VAT",
+    ltype:"Product Type", ldrop:"Standard Seller", ljex:"Jumia Express",
+    jexhint:"Jumia Express: lower shipping fees + exempt from minimum commission rule",
+    lprice:"Product Selling Price", lcur:"EGP",
+    lmain:"Main Category", lsub:"Subcategory",
+    ititle:"ℹ️ Minimum Commission Rule",
+    ibody:"If the calculated commission is less than 10 EGP (11.40 EGP incl. VAT), the minimum is automatically applied.",
+    iexm:"✅ Exempt from minimum: Grocery • Diapers • Jumia Express",
+    lres:"Calculation Result", lsell:"Selling Price", lcomm:"Jumia Commission",
+    lship:"Processing & Shipping Fee", ltot:"Total Fees",
+    lnet:"Net Amount Received",
+    lvatn:"* All fees include 14% VAT",
+    lfooter:"For educational purposes only. Actual figures may vary based on applicable terms.",
+    minapply:"Minimum applied", minnot:"Exempt from minimum", egp:"EGP",
+  }
+};
+
+function t(k){ return T[lang][k]||''; }
+function isAr(){ return lang==='ar'; }
+
+function toggleLang(){
+  lang = lang==='ar'?'en':'ar';
+  document.documentElement.lang=lang;
+  document.documentElement.dir=isAr()?'rtl':'ltr';
+  document.querySelector('.lang-btn').textContent=isAr()?'English':'عربي';
+  applyTexts();
+  renderMain();
+  if(selMain!==null) renderSubs();
+  calc();
+}
+
+function applyTexts(){
+  const map={
+    ttl:'ttl',sub:'sub',b1:'b1',b2:'b2',
+    ltype:'ltype',lprice:'lprice',lcur:'lcur',
+    lmain:'lmain',lsub:'lsub',
+    'i-title':'ititle','i-body':'ibody','i-exm':'iexm',
+    lres:'lres',lsell:'lsell',lcomm:'lcomm',lship:'lship',
+    ltot:'ltot',lnet:'lnet',lvatn:'lvatn',lfooter:'lfooter'
+  };
+  Object.entries(map).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=t(key);
+  });
+  document.getElementById('lbl-drop').textContent=t('ldrop');
+  document.getElementById('lbl-jex').textContent=t('ljex');
+  document.getElementById('jex-hint').textContent=t('jexhint');
+  document.getElementById('price').placeholder=isAr()?'أدخل السعر...':'Enter price...';
+}
+
+function setType(type){
+  isJex=type==='jex';
+  document.getElementById('btn-drop').classList.toggle('active',!isJex);
+  document.getElementById('btn-jex').classList.toggle('active',isJex);
+  document.getElementById('jex-hint').classList.toggle('hidden',!isJex);
+  if(selMain!==null) renderSubs();
+  calc();
+}
+
+function renderMain(){
+  const g=document.getElementById('main-grid');
+  g.innerHTML='';
+  DATA.forEach((cat,i)=>{
+    const d=document.createElement('div');
+    d.className='mcat'+(selMain===i?' active':'');
+    d.textContent=isAr()?cat.ar:cat.en;
+    d.onclick=()=>selectMain(i);
+    g.appendChild(d);
+  });
+}
+
+function selectMain(i){
+  selMain=i;
+  selSub=DATA[i].subs.length===1?0:null;
+  renderMain();
+  renderSubs();
+  if(DATA[i].subs.length===1) calc();
+  else { document.getElementById('result').classList.add('hidden'); }
+}
+
+function renderSubs(){
+  const card=document.getElementById('sub-card');
+  const list=document.getElementById('sub-list');
+  if(selMain===null){card.classList.add('hidden');return;}
+  const cat=DATA[selMain];
+  if(cat.subs.length<=1){card.classList.add('hidden');return;}
+  card.classList.remove('hidden');
+  list.innerHTML='';
+  cat.subs.forEach((s,i)=>{
+    const fee=isJex?s.jex:s.drop;
+    const d=document.createElement('div');
+    d.className='sub-item'+(selSub===i?' active':'');
+    d.innerHTML=
+      `<span class="sub-name">${isAr()?s.ar:s.en}</span>
+       <span class="chips">
+         <span class="chip chip-c">${s.comm}%</span>
+         <span class="chip chip-s">${fee} ${t('egp')}</span>
+       </span>`;
+    d.onclick=()=>{selSub=i;renderSubs();calc();};
+    list.appendChild(d);
+  });
+  const sub=card.querySelector('.sub-card-scroll');
+  if(sub) sub.scrollTop=0;
+}
+
+function calc(){
+  const price=parseFloat(document.getElementById('price').value)||0;
+  const res=document.getElementById('result');
+  if(!price||selMain===null||selSub===null){res.classList.add('hidden');return;}
+
+  const s=DATA[selMain].subs[selSub];
+  const fee=isJex?s.jex:s.drop;
+  const rawComm=price*s.comm/100;
+  const isExempt=isJex||!!s.exemptMin;
+  const minApplied=!isExempt&&rawComm<MIN_COMM;
+  const commission=minApplied?MIN_COMM:rawComm;
+  const total=commission+fee;
+  const net=price-total;
+  const E=t('egp');
+
+  document.getElementById('lcomm').textContent=
+    (isAr()?'عمولة جوميا':'Jumia Commission')+' ('+s.comm+'%)';
+
+  const mw=document.getElementById('r-min-w'),ew=document.getElementById('r-exm-w');
+  if(minApplied){
+    mw.classList.remove('hidden');
+    document.getElementById('r-min-t').textContent=
+      t('minapply')+': '+rawComm.toFixed(2)+' ← '+MIN_COMM+' '+E;
+    ew.classList.add('hidden');
+  } else if(isExempt&&rawComm<MIN_COMM){
+    ew.classList.remove('hidden');
+    document.getElementById('r-exm-t').textContent=t('minnot');
+    mw.classList.add('hidden');
+  } else { mw.classList.add('hidden'); ew.classList.add('hidden'); }
+
+  document.getElementById('r-price').textContent=price.toFixed(2)+' '+E;
+  document.getElementById('r-comm').textContent='- '+commission.toFixed(2)+' '+E;
+  document.getElementById('r-ship').textContent='- '+fee.toFixed(2)+' '+E;
+  document.getElementById('r-tot').textContent='- '+total.toFixed(2)+' '+E;
+  const ne=document.getElementById('r-net');
+  ne.textContent=net.toFixed(2)+' '+E;
+  ne.style.color=net>=0?'#2e7d32':'#c62828';
+
+  res.classList.remove('hidden');
+}
+
+applyTexts();
+renderMain();
+</script>
+</body>
+</html>
